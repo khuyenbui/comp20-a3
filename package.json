@@ -1,9 +1,10 @@
 {
-        "name": "node-example",
+        "name": "comp20-a3",
         "version": "0.0.1",
         "dependencies": {
                 "express": "latest",
                 "mongodb": "latest",
+		"validator": "latest",
                 "body-parser": "latest"
         }
 }
