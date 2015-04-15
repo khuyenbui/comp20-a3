@@ -17,11 +17,16 @@ var db = MongoClient.connect(mongoUri, function(error, databaseConnection) {
   db = databaseConnection;
 });
 
-// Express initialization
+// Initialization
 var express = require('express');
 var bodyParser = require('body-parser');
 var validator = require('validator'); // See documentation at https://github.com/chriso/validator.js
 var app = express();
+// See https://stackoverflow.com/questions/5710358/how-to-get-post-query-in-express-node-js
+app.use(bodyParser.json());
+// See https://stackoverflow.com/questions/25471856/express-throws-error-as-body-parser-deprecated-undefined-extended
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 // API for POST.
 // how to send the error messages?
@@ -40,7 +45,7 @@ app.post('/sendLocation', function (request, response) {
         var timeStamp = new Date();
         // use update with a call back
         // then I need to return everything.
-        db.collection('locations', function(er, collection) {
+        db.collection('locations', function ( er, collection) {
                 collection.update(
                         { "login": newLogin },
                         {
@@ -50,7 +55,7 @@ app.post('/sendLocation', function (request, response) {
                                 "created_at": timeStamp
                         },
                         { upsert: true },
-                        function(err, result) {
+                        function (err, result) {
                           // depending, we need to send back the result
                           // response.send({"error": "some messages"});
                           if (err) {
@@ -60,13 +65,19 @@ app.post('/sendLocation', function (request, response) {
                           }
                           else {
                                 // how do I send back the result as array? db.find()
-                                result = JSON.stringify(db.locations.find().toArray());
-                                response.status(200);
-                                response.send(result);
-//                                response.send(200);
-                          }
+                                collection.find().toArray(function (err, resultArray) {
+                                    if (!err) {
+                                      response.status(200);
+                                      response.send(resultArray);
+                                    }
+                                    else {
+                                      response.status(500)
+                                      response.send("Whoop something went wrong");
+                                    }
+                                  });
+                                }
+                              });
                         });
-        });
 });
 
 // return a JSON
@@ -77,13 +88,13 @@ app.get('/location.json', function (request, response) {
   var login = request.query.login;
   db.collection('locations', function (err, collection) {
     // if login name isn't there, send back empty json.
-    db.locations.find({"login": login }).toArray(function (err, result)
+    collection.find({"login": login }).toArray(function (err, result)
       {
         if (err) {
           response.send('{}');
         }
         else {
-          response.send(JSON.stringify(result));
+          response.send(result[0]);
         }
       });
   });
