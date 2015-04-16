@@ -38,10 +38,10 @@ app.post('/sendLocation', function (request, response) {
         var newLat = request.body.lat;
         var newLng = request.body.lng;
         var newLogin = request.body.login;
-/*        if (!request.body.lat|| !request.body.lng || !request.body.login) {
+        if (!request.body.lat|| !request.body.lng || !request.body.login) {
                 response.send('{"error":"Whoops, something is wrong with your data!"}');
         }
-                */
+
         var timeStamp = new Date();
         // use update with a call back
         // then I need to return everything.
@@ -114,7 +114,7 @@ app.get('/', function (request, response) {
             var lat = cursor[count].lat;
             var lng = cursor[count].lng;
             var time = cursor[count].created_at;
-            indexPage += "<p>" + login + " checked in at " + lat + " , " + lng + "at time " + time + " </p>";
+            indexPage += "<p>" + login + " checked in at " + lat + " , " + lng + " at time " + time + " </p>";
           }
         indexPage += "</body></html>"
         response.send(indexPage);
